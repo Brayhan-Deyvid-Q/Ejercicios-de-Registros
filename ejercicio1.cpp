@@ -3,6 +3,8 @@
 #include<windows.h>
 using namespace std; 
 
+const int limite_contactos = 50; 
+
 struct contactoEmail{
 	string nombre;
 	string sexo;
@@ -13,16 +15,75 @@ struct contactoEmail{
 };
 
 
-/*void eliminarContacto(contactoEmail cont[], int &n, int indice){
-	if(indice>=0 && indice<n){
-		for(int i=indice; i<n-1 ; ++i){
-			cont[i]=cont[i+1];
-		}
-		n--;
-	}else{
-		cout<<"Índice no válido"<<endl;
+void eliminarContactos(contactoEmail contactos[], int &cantidadContactos, int indice){
+	
+	if(cantidadContactos==0){
+		cout<<"No se ha registrado ningun contacto hasta el momento. "; 
 	}
-}*/
+	
+	if(indice >= 0 && indice < limite_contactos){
+		for(int i=indice; i < cantidadContactos - 1; ++i){
+			contactos[i]=contactos[i+1]; 
+		}
+		
+		cantidadContactos--; 
+		
+		cout<<"\nEL CONTACTO SE ELIMINO SATISFACTORIAMENTE!\n"; 
+		cout<<"\n"; 
+		
+	}
+	else{
+		cout<<"El indice ingresado no es valido. "; 
+	}
+}
+
+void mostrarContactos(contactoEmail contactos[], int cantidadContactos){
+	if(cantidadContactos == 0){
+		cout<<"\nNingun contacto por mostrar. "<<endl;
+	}
+	else{
+	   for(int i=0; i<cantidadContactos; ++i){
+	   	cout<<"Contacto: "<<i+1<<" | "<<" -> "<<"INDICE: "<< i <<endl; 
+	   	cout<<"Nombres completos: "<<contactos[i].nombre<<endl;
+	   	cout<<"Sexo: "<<contactos[i].sexo<<endl; 
+	   	cout<<"Edad: "<<contactos[i].edad<<endl; 
+	   	cout<<"Telefono: "<<contactos[i].telefono<<endl; 
+	   	cout<<"Email: "<<contactos[i].email<<endl; 
+	   	cout<<"Nacionalidad: "<<contactos[i].nacionalidad<<endl; 
+	   	cout<<"\n"; 
+	   }
+	}
+}
+
+string obtenerDominio(const string& email){
+    int buscarroba=-1;
+    for (int i=0;i<email.length();++i){
+        if(email[i]=='@') {
+            buscarroba=i;
+            break;
+        }
+    }
+    if(buscarroba == -1){
+        return "";
+    }
+    string dominio = "";
+    for(int i = buscarroba + 1; i<email.length();++i){
+        dominio+=email[i];
+    }
+    return dominio;
+}
+
+void ordenServidor(contactoEmail contactos[], int cantidadContactos) {
+    for (int i = 0; i<cantidadContactos - 1; ++i) {
+        for (int j = 0; j<cantidadContactos - 1 - i; ++j) {
+            if (obtenerDominio(contactos[j].email)>obtenerDominio(contactos[j + 1].email)){
+                contactoEmail temp =contactos[j];
+                contactos[j]=contactos[j + 1];
+                contactos[j+1]=temp;
+            }
+        }
+    }
+}
 
 int main(){
 	
@@ -32,6 +93,9 @@ int main(){
 	int i;
 	char opcion, indice;
 	SetConsoleOutputCP(CP_UTF8);
+	int cantidadContactos=0;
+	contactoEmail contactos[limite_contactos]; 
+
 	
 	while(opcion != 'e'){
 	cout<<"\nBienvenido a Email\n";
@@ -45,7 +109,7 @@ int main(){
 	
 	switch(opcion){
 	    case 'a': 
-	     	i=contador_a;
+	     	//i=contador_a;
 	     	cout<<"Ingrese el nombre completo del contacto: ";
 		    cin.ignore();
 	    	getline(cin, cont[i].nombre);
@@ -72,25 +136,26 @@ int main(){
 		
 		    break;  	  	  
 	    case 'b':
-			/*cout<<"Ingrese el índice del contacto a eliminar: ";
-			cin>> indice;
-			eliminarContacto(cont, contador_a, indice);
-			cout<<"Contacto eliminado..."<<endl<<endl;*/
+			int indice; 
+		         cout<<"Ingrese el indice del contacto a eliminar."<<endl;
+			 	cout<<"Tenga en cuenta que los indices inician desde el 0. Indice: "; 
+		 	    cin>>indice; 
+		    	eliminarContactos(contactos, cantidadContactos, indice); 
 			break;	
 	    case 'c':
-	    		cout<<"\nDatos de los contactos registrados recientemente:\n";
-	    	for(int i=0; i<contador_a; i++){
-	    		cout<<"Contacto "<<i+1<<" : "<<endl;
-		        cout<<"Nombre: "<<cont[i].nombre<<endl
-		            <<"Sexo: "<<cont[i].sexo<<endl
-     		        <<"Edad: "<<cont[i].edad<<endl
-		            <<"Número: "<<cont[i].telefono<<endl
-		            <<"Email: "<<cont[i].email<<endl
-     		        <<"Nacionalidad: "<<cont[i].nacionalidad<<endl<<endl;
-			}
+	    		 mostrarContactos(contactos, cantidadContactos);  
+				    break; 
 	    	break;	
-	    case 'd':	
-	    	break;
+	    case 'd':
+		if(cantidadContactos == 0){
+			cout<<"\nNingun contacto por mostrar. "<<endl;
+	}
+     	    cout<<"\nMOSTRANDO CONTACTOS SEGUN EL ORDEN POR SERVIDOR: \n"; 
+     	     
+  		    ordenServidor(contactos, cantidadContactos); 
+            mostrarContactos(contactos, cantidadContactos); 
+   	       	break; 	
+	    	
 	    case 'e':	
 	    	break;
 	    default:
